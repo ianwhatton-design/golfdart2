@@ -465,10 +465,11 @@
 </div>
 
 <script>
-// ── STORAGE HELPERS ──
-const STORAGE_KEY = 'simply_darts_open_profiles_v2';
+// ── STORAGE ──
+// Uses the artifact window.storage API (personal, non-shared)
+const STORAGE_KEY = 'darts-open-profiles-v3';
 
-// Compress avatar to small thumbnail before saving (prevents storage overflow)
+// Compress avatar to 120x120 JPEG to stay well under 5MB limit
 function compressAvatar(dataUrl, size = 120) {
   return new Promise(resolve => {
     if (!dataUrl || !dataUrl.startsWith('data:image')) { resolve(dataUrl); return; }
@@ -477,60 +478,38 @@ function compressAvatar(dataUrl, size = 120) {
       const canvas = document.createElement('canvas');
       canvas.width = size; canvas.height = size;
       const ctx = canvas.getContext('2d');
-      // Crop to square from center
       const min = Math.min(img.width, img.height);
       const sx = (img.width - min) / 2, sy = (img.height - min) / 2;
       ctx.drawImage(img, sx, sy, min, min, 0, 0, size, size);
-      resolve(canvas.toDataURL('image/jpeg', 0.7));
+      resolve(canvas.toDataURL('image/jpeg', 0.65));
     };
-    img.onerror = () => resolve(dataUrl);
+    img.onerror = () => resolve(null);
     img.src = dataUrl;
   });
 }
 
-async function storageSet(key, value) {
-  // Try window.storage first, fallback to sessionStorage then memory
-  if (typeof window.storage !== 'undefined') {
-    try { await window.storage.set(key, value); return true; } catch {}
-  }
-  try { sessionStorage.setItem(key, value); return true; } catch {}
-  try { localStorage.setItem(key, value); return true; } catch {}
-  return false;
-}
-
-async function storageGet(key) {
-  if (typeof window.storage !== 'undefined') {
-    try {
-      const r = await window.storage.get(key);
-      if (r && r.value) return r.value;
-    } catch {}
-  }
-  try { const v = sessionStorage.getItem(key); if (v) return v; } catch {}
-  try { const v = localStorage.getItem(key); if (v) return v; } catch {}
-  return null;
-}
-
 async function loadProfiles() {
-  // Wait for storage to be ready
-  await new Promise(res => setTimeout(res, 200));
   try {
-    const raw = await storageGet(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch { return []; }
+    const result = await window.storage.get(STORAGE_KEY, false);
+    return JSON.parse(result.value);
+  } catch {
+    // Key doesn't exist yet or storage not ready — that's fine, start empty
+    return [];
+  }
 }
 
 async function saveProfiles(p) {
-  // Compress all avatars before saving to keep size small
-  const compressed = await Promise.all(p.map(async prof => ({
+  // Compress avatars first
+  const toSave = await Promise.all(p.map(async prof => ({
     ...prof,
     avatar: prof.avatar ? await compressAvatar(prof.avatar) : null
   })));
+  profiles = toSave; // update in-memory copy with compressed versions
   try {
-    const json = JSON.stringify(compressed);
-    await storageSet(STORAGE_KEY, json);
-    // Update in-memory profiles with compressed avatars too
-    profiles = compressed;
-  } catch (e) { console.error('Save failed', e); }
+    await window.storage.set(STORAGE_KEY, JSON.stringify(toSave), false);
+  } catch (e) {
+    console.warn('Storage save failed:', e);
+  }
 }
 
 // ── STATE ──
