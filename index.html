@@ -332,21 +332,21 @@
 <!-- SETUP SCREEN -->
 <div class="screen active" id="screenSetup">
   <div class="setup-layout">
-    <!-- Left: pick from profiles or type names -->
+    <!-- Left: Lineup + format buttons -->
     <div class="setup-card">
-      <div class="setup-title">⛳ SELECT PLAYERS</div>
-      <div id="profilePickList" class="profile-pick-list"></div>
-      <div id="manualSlots"></div>
-      <button class="btn-add-player" id="btnAddManual" onclick="addManualSlot()">+ Add Guest Player</button>
+      <div class="setup-title">📋 LINEUP</div>
+      <div id="lineupList"></div>
       <div class="format-buttons">
         <button class="btn-format" onclick="startGame(9)">FRONT 9<span class="holes">9 HOLES</span></button>
         <button class="btn-format" onclick="startGame(18)">FULL 18<span class="holes">18 HOLES</span></button>
       </div>
     </div>
-    <!-- Right: selected lineup -->
+    <!-- Right: pick from profiles or type names -->
     <div class="setup-card">
-      <div class="setup-title">📋 LINEUP</div>
-      <div id="lineupList"></div>
+      <div class="setup-title">⛳ SELECT PLAYERS</div>
+      <div id="profilePickList" class="profile-pick-list"></div>
+      <div id="manualSlots"></div>
+      <button class="btn-add-player" id="btnAddManual" onclick="addManualSlot()">+ Add Guest Player</button>
     </div>
   </div>
 </div>
@@ -414,11 +414,15 @@
   <div class="modal-box">
     <div class="modal-icon">👤</div>
     <div class="modal-title" id="profileModalTitle">NEW PROFILE</div>
-    <label class="avatar-upload-label" for="avatarInput">
+    <div class="avatar-upload-label" onclick="void 0">
       <img class="avatar-preview" id="avatarPreview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Ccircle cx='40' cy='30' r='18' fill='%23556080'/%3E%3Cellipse cx='40' cy='72' rx='28' ry='20' fill='%23556080'/%3E%3C/svg%3E" alt="">
-      <span class="avatar-upload-hint">TAP TO ADD PHOTO</span>
-    </label>
-    <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="previewAvatar(event)">
+      <div style="display:flex;gap:10px;margin-top:4px;">
+        <label for="avatarCamera" style="cursor:pointer;background:rgba(55,189,238,0.15);border:1px solid var(--lightblue);border-radius:8px;padding:7px 14px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;color:var(--lightblue);">📷 CAMERA</label>
+        <label for="avatarGallery" style="cursor:pointer;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;color:var(--muted);">🖼 GALLERY</label>
+      </div>
+    </div>
+    <input type="file" id="avatarCamera" accept="image/*" capture="user" style="display:none" onchange="previewAvatar(event)">
+    <input type="file" id="avatarGallery" accept="image/*" style="display:none" onchange="previewAvatar(event)">
     <input class="modal-input" id="profileNameInput" placeholder="PLAYER NAME" maxlength="20">
     <div class="modal-buttons">
       <button class="btn-modal-cancel" onclick="closeModal('addProfileModal')">CANCEL</button>
