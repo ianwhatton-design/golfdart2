@@ -37,9 +37,9 @@
     position: sticky; top: 0; z-index: 100;
     box-shadow: 0 4px 30px rgba(55,189,238,0.12);
   }
-  .logo-block { display: flex; flex-direction: column; }
-  .logo-sub { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--green); letter-spacing: 4px; }
-  .logo-title { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 3px; line-height: 1; color: var(--white); }
+  .logo-block { display: flex; align-items: baseline; gap: 10px; }
+  .logo-sub { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 3px; line-height: 1; color: var(--white); }
+  .logo-title { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 3px; line-height: 1; color: var(--green); }
   .logo-title span { color: var(--green); }
   .header-right { display: flex; align-items: center; gap: 16px; }
   .badge-label { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; text-align: right; }
@@ -307,7 +307,7 @@
 <header>
   <div class="logo-block">
     <span class="logo-sub">Simply Darts</span>
-    <span class="logo-title">The <span>Open</span></span>
+    <span class="logo-title">· The <span>Open</span></span>
   </div>
   <div class="header-right">
     <button class="btn-nav" id="navProfiles" onclick="showScreen('profiles')">👤 PROFILES</button>
@@ -467,13 +467,26 @@
 <script>
 // ── STORAGE HELPERS ──
 async function loadProfiles() {
-  try {
-    const r = await window.storage.get('darts_golf_profiles');
-    return r ? JSON.parse(r.value) : [];
-  } catch { return []; }
+  // Retry up to 5 times with delay - storage may not be ready immediately on load
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      const r = await window.storage.get('darts_golf_profiles');
+      return r ? JSON.parse(r.value) : [];
+    } catch (e) {
+      if (attempt < 4) await new Promise(res => setTimeout(res, 300 * (attempt + 1)));
+    }
+  }
+  return [];
 }
 async function saveProfiles(p) {
-  try { await window.storage.set('darts_golf_profiles', JSON.stringify(p)); } catch {}
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      await window.storage.set('darts_golf_profiles', JSON.stringify(p));
+      return;
+    } catch (e) {
+      if (attempt < 2) await new Promise(res => setTimeout(res, 200));
+    }
+  }
 }
 
 // ── STATE ──
@@ -490,6 +503,9 @@ let celebrationData = null;
 
 // ── INIT ──
 async function init() {
+  // Show subtle loading state
+  const grid = document.getElementById('profilesGrid');
+  if (grid) grid.innerHTML = '<div style="color:var(--muted);font-size:12px;letter-spacing:2px;text-align:center;padding:30px;">LOADING...</div>';
   profiles = await loadProfiles();
   renderProfilesScreen();
   renderSetupScreen();
