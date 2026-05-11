@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simply Darts Open</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0F1C33;
+    --surface: #162036;
+    --surface2: #1c2840;
+    --border: #2a3a52;
+    --green: #00c853;
+    --green-dim: #00a844;
+    --red: #ff3d3d;
+    --yellow: #FEEE00;
+    --cyan: #00e5ff;
+    --white: #f0f0f0;
+    --muted: #556080;
+    --eagle: #f9a825;
+    --birdie: #00c853;
+    --par: #f0f0f0;
+    --bogey: #ef5350;
+    --double: #b71c1c;
+    --lightblue: #37BDEE;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--white); font-family: 'Rajdhani', sans-serif; min-height: 100vh; overflow-x: hidden; }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, #0c1829 0%, #0F1C33 50%, #0c1829 100%);
+    border-bottom: 2px solid var(--lightblue);
+    padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 4px 30px rgba(55,189,238,0.12);
+  }
+  .logo-block { display: flex; flex-direction: column; }
+  .logo-sub { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--green); letter-spacing: 4px; }
+  .logo-title { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 3px; line-height: 1; color: var(--white); }
+  .logo-title span { color: var(--green); }
+  .header-right { display: flex; align-items: center; gap: 16px; }
+  .badge-label { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; text-align: right; }
+  .badge-mode { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--cyan); letter-spacing: 2px; text-align: right; }
+
+  /* NAV BUTTONS */
+  .btn-nav {
+    background: transparent; border: 1px solid rgba(55,189,238,0.35); border-radius: 7px;
+    color: var(--lightblue); cursor: pointer; font-family: 'Rajdhani', sans-serif;
+    font-size: 12px; font-weight: 700; letter-spacing: 2px; padding: 7px 13px;
+    text-transform: uppercase; transition: all .2s;
+  }
+  .btn-nav:hover { background: rgba(55,189,238,0.12); border-color: var(--lightblue); }
+  .btn-nav.active-nav { background: rgba(55,189,238,0.15); border-color: var(--lightblue); color: var(--white); }
+
+  /* SCREENS */
+  .screen { display: none; padding: 20px; max-width: 1280px; margin: 0 auto; }
+  .screen.active { display: block; }
+
+  /* ── PROFILES SCREEN ── */
+  .profiles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px; }
+  .profile-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px; text-align: center; position: relative; transition: border-color .2s;
+  }
+  .profile-card:hover { border-color: var(--lightblue); }
+  .profile-avatar {
+    width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 12px;
+    background: var(--surface2); border: 2px solid var(--border);
+    object-fit: cover; display: block; cursor: pointer;
+  }
+  .profile-avatar-placeholder {
+    width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 12px;
+    background: var(--surface2); border: 2px dashed var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; cursor: pointer; transition: border-color .2s;
+  }
+  .profile-avatar-placeholder:hover { border-color: var(--lightblue); }
+  .profile-name { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; margin-bottom: 4px; }
+  .profile-rounds { font-size: 11px; color: var(--muted); letter-spacing: 1px; margin-bottom: 12px; }
+  .profile-best { font-size: 12px; color: var(--cyan); font-family: 'Share Tech Mono', monospace; margin-bottom: 12px; }
+  .profile-actions { display: flex; gap: 8px; justify-content: center; }
+  .btn-sm {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--muted); cursor: pointer; font-family: 'Rajdhani', sans-serif;
+    font-size: 11px; font-weight: 700; letter-spacing: 1px; padding: 5px 10px; transition: all .2s;
+  }
+  .btn-sm:hover { border-color: var(--lightblue); color: var(--white); }
+  .btn-sm.danger:hover { border-color: var(--red); color: var(--red); }
+  .btn-sm.highlight { border-color: var(--green); color: var(--green); }
+  .btn-sm.highlight:hover { background: rgba(0,200,83,0.1); }
+  .add-profile-card {
+    background: var(--surface); border: 2px dashed var(--border); border-radius: 12px;
+    padding: 20px; text-align: center; cursor: pointer; transition: all .2s; min-height: 180px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  }
+  .add-profile-card:hover { border-color: var(--green); }
+  .add-profile-card .plus { font-size: 36px; color: var(--muted); }
+  .add-profile-card .add-label { font-family: 'Bebas Neue', sans-serif; font-size: 16px; color: var(--muted); letter-spacing: 2px; }
+
+  /* Round history modal */
+  .history-list { max-height: 320px; overflow-y: auto; }
+  .history-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+  }
+  .history-row:last-child { border-bottom: none; }
+  .history-date { font-size: 11px; color: var(--muted); font-family: 'Share Tech Mono', monospace; }
+  .history-holes { font-size: 11px; color: var(--cyan); font-family: 'Share Tech Mono', monospace; letter-spacing: 1px; }
+  .history-score { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 1px; }
+  .history-won { font-size: 10px; color: var(--yellow); letter-spacing: 1px; }
+
+  /* ── SETUP SCREEN ── */
+  .setup-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 900px; margin: 20px auto; }
+  .setup-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px;
+  }
+  .setup-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: var(--lightblue); margin-bottom: 16px; }
+
+  .player-slot {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
+    transition: border-color .2s;
+  }
+  .player-slot:hover { border-color: var(--lightblue); }
+  .slot-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; background: var(--border); flex-shrink: 0; }
+  .slot-name { flex: 1; font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 1px; }
+  .slot-name-input {
+    flex: 1; background: transparent; border: none; color: var(--white);
+    font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 600; outline: none;
+  }
+  .slot-name-input::placeholder { color: var(--muted); }
+
+  .btn-remove {
+    background: rgba(255,61,61,0.12); border: 1px solid rgba(255,61,61,0.25); border-radius: 6px;
+    color: var(--red); cursor: pointer; font-size: 14px; padding: 0 10px; height: 30px; transition: background .2s;
+  }
+  .btn-remove:hover { background: rgba(255,61,61,0.3); }
+
+  .profile-pick-list { max-height: 280px; overflow-y: auto; }
+  .profile-pick-row {
+    display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 8px;
+    cursor: pointer; transition: background .2s; margin-bottom: 4px;
+  }
+  .profile-pick-row:hover { background: var(--surface2); }
+  .profile-pick-row.selected { background: rgba(0,200,83,0.1); border: 1px solid rgba(0,200,83,0.3); }
+  .pick-avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; background: var(--surface2); }
+  .pick-name { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 1px; }
+  .pick-stats { font-size: 11px; color: var(--muted); font-family: 'Share Tech Mono', monospace; }
+  .pick-check { margin-left: auto; color: var(--green); font-size: 18px; }
+
+  .btn-add-player {
+    background: transparent; border: 1px dashed var(--border); border-radius: 6px;
+    color: var(--muted); cursor: pointer; font-family: 'Rajdhani', sans-serif;
+    font-size: 13px; font-weight: 600; letter-spacing: 1px; padding: 9px; text-align: center;
+    width: 100%; margin-top: 8px; transition: all .2s;
+  }
+  .btn-add-player:hover { border-color: var(--green); color: var(--green); }
+
+  .format-buttons { display: flex; gap: 12px; margin-top: 16px; }
+  .btn-format {
+    flex: 1; background: var(--surface2); border: 2px solid var(--border); border-radius: 10px;
+    color: var(--white); cursor: pointer; font-family: 'Bebas Neue', sans-serif; font-size: 22px;
+    letter-spacing: 2px; padding: 16px; text-align: center; transition: all .2s;
+  }
+  .btn-format:hover { border-color: var(--cyan); color: var(--cyan); }
+  .btn-format .holes { display: block; font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 2px; color: var(--muted); margin-top: 2px; }
+
+  /* ── GAME SCREEN ── */
+  .game-layout { display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: start; }
+
+  /* Leaderboard */
+  .leaderboard { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .lb-header { background: var(--lightblue); color: #0F1C33; font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 3px; padding: 10px 16px; }
+  .lb-table { width: 100%; border-collapse: collapse; }
+  .lb-table th { background: var(--surface2); color: var(--yellow); font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 2px; padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  .lb-table th.right, .lb-table td.right { text-align: right; }
+  .lb-table td { padding: 10px 12px; font-size: 14px; font-weight: 600; border-bottom: 1px solid var(--border); transition: background .2s; }
+  .lb-table td.player-name { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 1px; }
+  .lb-player-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; background: var(--surface2); vertical-align: middle; margin-right: 6px; }
+  .lb-table tr:last-child td { border-bottom: none; }
+  .lb-table tr.active-row td { background: rgba(0,200,83,0.08); }
+  .lb-table tr.active-row td.player-name { color: var(--green); }
+  .pos-badge { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; font-family: 'Bebas Neue', sans-serif; font-size: 14px; }
+  .pos-1 { background: var(--yellow); color: #000; }
+  .pos-2 { background: #c0c0c0; color: #000; }
+  .pos-3 { background: #cd7f32; color: #000; }
+  .pos-other { background: var(--surface2); color: var(--muted); }
+  .score-chip { display: inline-block; padding: 2px 8px; border-radius: 4px; font-family: 'Share Tech Mono', monospace; font-size: 13px; }
+  .chip-eagle { background: rgba(249,168,37,0.2); color: var(--eagle); border: 1px solid rgba(249,168,37,0.4); }
+  .chip-birdie { background: rgba(0,200,83,0.15); color: var(--birdie); border: 1px solid rgba(0,200,83,0.3); }
+  .chip-par { background: transparent; color: var(--par); border: 1px solid var(--border); }
+  .chip-bogey { background: rgba(239,83,80,0.15); color: var(--bogey); border: 1px solid rgba(239,83,80,0.3); }
+  .chip-double { background: rgba(183,28,28,0.2); color: #ef9a9a; border: 1px solid rgba(183,28,28,0.4); }
+  .chip-zero { background: transparent; color: var(--muted); border: 1px solid transparent; }
+  .holes-played { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--muted); }
+  .leaderboard-col { position: sticky; top: 78px; align-self: start; }
+
+  /* Scorecard */
+  .scorecard-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .sc-header { background: var(--lightblue); color: #0F1C33; font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 3px; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; }
+  .sc-header .undo-btn { background: rgba(0,0,0,0.2); border: none; border-radius: 6px; color: #000; cursor: pointer; font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1px; padding: 4px 12px; transition: background .2s; }
+  .sc-header .undo-btn:hover { background: rgba(0,0,0,0.4); }
+  .sc-header .undo-btn:disabled { opacity: .4; cursor: default; }
+  .scorecard-table { width: 100%; border-collapse: collapse; min-width: 600px; }
+  .scorecard-table th, .scorecard-table td { border: 1px solid var(--border); text-align: center; padding: 0; }
+  .scorecard-table .col-player { text-align: left; padding: 0 10px; min-width: 120px; position: sticky; left: 0; background: var(--surface2); z-index: 2; }
+  .sc-section-header { background: rgba(55,189,238,0.10); color: var(--lightblue); font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 3px; padding: 7px 4px; border-bottom: 1px solid var(--border); }
+  .sc-hole-header { background: var(--surface2); color: var(--yellow); font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 1px; padding: 8px 4px; min-width: 42px; }
+  .sc-player-row td { height: 44px; font-family: 'Share Tech Mono', monospace; font-size: 17px; }
+  .sc-player-row.active-player .col-player { color: var(--green); }
+  .cell-val { display: flex; align-items: center; justify-content: center; height: 44px; width: 100%; font-size: 17px; font-weight: 700; }
+  .cv-eagle { color: var(--eagle); }
+  .cv-birdie { background: rgba(0,200,83,0.12); color: var(--birdie); }
+  .cv-par { color: var(--white); }
+  .cv-bogey { background: rgba(239,83,80,0.1); color: var(--bogey); }
+  .cv-double { background: rgba(183,28,28,0.15); color: #ef9a9a; }
+  .total-cell { background: var(--surface2) !important; font-weight: 700 !important; }
+
+  /* Scoring panel */
+  .scoring-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; display: flex; gap: 18px; align-items: center; margin-bottom: 14px; }
+  .now-playing { flex-shrink: 0; min-width: 150px; border-right: 1px solid var(--border); padding-right: 18px; display: flex; align-items: center; gap: 12px; }
+  .now-avatar { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; background: var(--surface2); border: 2px solid var(--border); flex-shrink: 0; }
+  .now-text {}
+  .now-label { font-size: 13px; color: var(--white); letter-spacing: 3px; text-transform: uppercase; font-family: 'Bebas Neue', sans-serif; }
+  .now-player { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--white); letter-spacing: 1px; line-height: 1; }
+  .now-hole { font-size: 22px; color: var(--cyan); font-weight: 700; letter-spacing: 2px; font-family: 'Bebas Neue', sans-serif; }
+  .score-buttons { flex: 1; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .btn-score { border: 2px solid; border-radius: 8px; cursor: pointer; font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 1px; padding: 12px 4px 8px; text-align: center; transition: all .15s; line-height: 1; }
+  .btn-score .score-val { display: block; font-size: 22px; }
+  .btn-score .score-label { display: block; font-family: 'Rajdhani', sans-serif; font-size: 9px; font-weight: 700; letter-spacing: 1px; margin-top: 2px; }
+  .btn-dbl-bogey { background: rgba(183,28,28,0.15); border-color: #b71c1c; color: #ef9a9a; }
+  .btn-dbl-bogey:hover { background: rgba(183,28,28,0.35); }
+  .btn-bogey { background: rgba(239,83,80,0.12); border-color: #ef5350; color: var(--bogey); }
+  .btn-bogey:hover { background: rgba(239,83,80,0.3); }
+  .btn-par { background: rgba(240,240,240,0.07); border-color: var(--border); color: var(--white); }
+  .btn-par:hover { background: rgba(240,240,240,0.15); border-color: var(--white); }
+  .btn-birdie { background: rgba(0,200,83,0.12); border-color: var(--green-dim); color: var(--green); }
+  .btn-birdie:hover { background: rgba(0,200,83,0.28); }
+  .btn-eagle { background: rgba(249,168,37,0.12); border-color: #f9a825; color: var(--eagle); }
+  .btn-eagle:hover { background: rgba(249,168,37,0.28); }
+  .undo-col { flex-shrink: 0; }
+  .btn-undo-main { background: rgba(255,61,61,0.1); border: 1px solid rgba(255,61,61,0.4); border-radius: 8px; color: #ff8080; cursor: pointer; font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 2px; padding: 10px 14px; white-space: nowrap; transition: all .2s; }
+  .btn-undo-main:hover { background: rgba(255,61,61,0.25); color: #fff; }
+  .btn-undo-main:disabled { opacity: .25; cursor: default; }
+
+  /* Finish / Playoff */
+  .finish-panel { text-align: center; padding: 20px 0; }
+  .playoff-title { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: var(--yellow); letter-spacing: 3px; margin-bottom: 6px; }
+  .playoff-sub { font-size: 13px; color: var(--muted); letter-spacing: 1px; margin-bottom: 16px; }
+  .playoff-players { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 14px; }
+  .btn-playoff-winner { background: var(--surface2); border: 2px solid var(--yellow); border-radius: 10px; color: var(--yellow); cursor: pointer; font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 2px; padding: 12px 22px; transition: all .2s; }
+  .btn-playoff-winner:hover { background: rgba(255,214,0,0.15); transform: scale(1.05); }
+
+  /* ── MODALS ── */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 500; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .modal-overlay.active { display: flex; }
+  .modal-box { background: #0F1C33; border: 1px solid var(--lightblue); border-radius: 14px; padding: 28px 32px; text-align: center; max-width: 400px; width: 92%; box-shadow: 0 0 60px rgba(55,189,238,0.15); }
+  .modal-icon { font-size: 34px; margin-bottom: 10px; }
+  .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 2px; color: var(--white); margin-bottom: 8px; }
+  .modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 22px; letter-spacing: 1px; line-height: 1.5; }
+  .modal-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .btn-modal-cancel { background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--muted); cursor: pointer; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 2px; padding: 10px 22px; transition: all .2s; }
+  .btn-modal-cancel:hover { border-color: var(--white); color: var(--white); }
+  .btn-modal-action { background: var(--green); border: none; border-radius: 8px; color: #000; cursor: pointer; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 2px; padding: 10px 22px; transition: all .2s; }
+  .btn-modal-action:hover { background: #00a844; }
+  .btn-modal-danger { background: var(--red); border: none; border-radius: 8px; color: #fff; cursor: pointer; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 2px; padding: 10px 22px; transition: all .2s; }
+  .btn-modal-danger:hover { background: #cc0000; }
+  .modal-input { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--white); font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 600; padding: 10px 14px; width: 100%; outline: none; margin-bottom: 16px; text-align: center; }
+  .modal-input:focus { border-color: var(--green); }
+  .avatar-upload-label { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; margin-bottom: 16px; }
+  .avatar-preview { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; background: var(--surface2); border: 2px dashed var(--border); }
+  .avatar-upload-hint { font-size: 11px; color: var(--muted); letter-spacing: 1px; }
+
+  /* ── CELEBRATION ── */
+  #screenCelebration { display: none; position: fixed; inset: 0; background: #0F1C33; z-index: 999; overflow: hidden; }
+  #screenCelebration.active { display: flex; align-items: center; justify-content: center; flex-direction: column; }
+  .cel-bg-glow { position: absolute; inset: 0; background: radial-gradient(ellipse 60% 50% at 50% 60%, rgba(126,187,77,0.18) 0%, transparent 70%), radial-gradient(ellipse 40% 40% at 20% 20%, rgba(55,189,238,0.10) 0%, transparent 60%), radial-gradient(ellipse 40% 40% at 80% 80%, rgba(254,238,0,0.08) 0%, transparent 60%); pointer-events: none; }
+  .cel-content { position: relative; text-align: center; padding: 30px; max-width: 700px; }
+  .cel-eyebrow { font-family: 'Share Tech Mono', monospace; font-size: 11px; letter-spacing: 5px; color: var(--cyan); text-transform: uppercase; margin-bottom: 8px; opacity: 0; animation: fadeUp .6s .3s forwards; }
+  .cel-tournament { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 6px; color: rgba(255,255,255,0.5); margin-bottom: 6px; opacity: 0; animation: fadeUp .6s .5s forwards; }
+  .cel-winner-avatar { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--yellow); margin: 0 auto 10px; display: block; opacity: 0; animation: popIn .7s .65s cubic-bezier(0.175,0.885,0.32,1.275) forwards; }
+  .cel-trophy { font-size: 70px; line-height: 1; margin: 6px 0; opacity: 0; animation: popIn .7s .7s cubic-bezier(0.175,0.885,0.32,1.275) forwards; display: block; }
+  .cel-winner-label { font-family: 'Share Tech Mono', monospace; font-size: 11px; letter-spacing: 5px; color: var(--green); text-transform: uppercase; margin-bottom: 6px; opacity: 0; animation: fadeUp .6s .9s forwards; }
+  .cel-winner-name { font-family: 'Bebas Neue', sans-serif; font-size: clamp(52px, 10vw, 96px); letter-spacing: 4px; line-height: 1; background: linear-gradient(135deg, #7EBB4C 0%, #37BDEE 50%, #FEEE00 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; opacity: 0; animation: fadeUp .7s 1.1s forwards; margin-bottom: 6px; }
+  .cel-score-badge { display: inline-block; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15); border-radius: 30px; font-family: 'Share Tech Mono', monospace; font-size: 17px; color: var(--white); padding: 5px 22px; margin-bottom: 6px; opacity: 0; animation: fadeUp .6s 1.3s forwards; }
+  .cel-playoff-tag { display: inline-block; background: rgba(254,238,0,0.12); border: 1px solid rgba(254,238,0,0.35); border-radius: 20px; font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 3px; color: var(--yellow); padding: 3px 16px; margin-bottom: 8px; text-transform: uppercase; opacity: 0; animation: fadeUp .6s 1.4s forwards; }
+  .cel-runners { font-family: 'Rajdhani', sans-serif; font-size: 13px; color: rgba(255,255,255,0.35); letter-spacing: 2px; margin-bottom: 20px; opacity: 0; animation: fadeUp .6s 1.5s forwards; }
+  .cel-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; opacity: 0; animation: fadeUp .6s 1.7s forwards; }
+  .btn-cel-new { background: var(--green); border: none; border-radius: 10px; color: #000; cursor: pointer; font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 3px; padding: 12px 30px; transition: all .2s; }
+  .btn-cel-new:hover { background: #00a844; transform: scale(1.04); }
+  .btn-cel-cert { background: rgba(254,238,0,0.15); border: 2px solid var(--yellow); border-radius: 10px; color: var(--yellow); cursor: pointer; font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 3px; padding: 12px 30px; transition: all .2s; }
+  .btn-cel-cert:hover { background: rgba(254,238,0,0.28); transform: scale(1.04); }
+  .confetti-piece { position: absolute; width: 10px; height: 10px; opacity: 0; animation: confettiFall linear forwards; border-radius: 2px; }
+
+  @keyframes fadeUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
+  @keyframes popIn { from { opacity:0; transform: scale(0.3) rotate(-10deg); } to { opacity:1; transform: scale(1) rotate(0deg); } }
+  @keyframes confettiFall { 0% { opacity:1; transform: translateY(-20px) rotate(0deg); } 100% { opacity:0; transform: translateY(100vh) rotate(720deg); } }
+
+  @media (max-width: 900px) { .game-layout { grid-template-columns: 1fr; } .leaderboard-col { position: static; } .setup-layout { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-block">
+    <span class="logo-sub">Simply Darts</span>
+    <span class="logo-title">The <span>Open</span></span>
+  </div>
+  <div class="header-right">
+    <button class="btn-nav" id="navProfiles" onclick="showScreen('profiles')">👤 PROFILES</button>
+    <button class="btn-nav" id="navSetup" onclick="handleHome()">⛳ GAME</button>
+    <div>
+      <div class="badge-label">Format</div>
+      <div class="badge-mode" id="headerMode">—</div>
+    </div>
+  </div>
+</header>
+
+<!-- PROFILES SCREEN -->
+<div class="screen" id="screenProfiles">
+  <div style="max-width:1000px;margin:20px auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:var(--lightblue)">👤 PLAYER PROFILES</div>
+    </div>
+    <div class="profiles-grid" id="profilesGrid"></div>
+  </div>
+</div>
+
+<!-- SETUP SCREEN -->
+<div class="screen active" id="screenSetup">
+  <div class="setup-layout">
+    <!-- Left: pick from profiles or type names -->
+    <div class="setup-card">
+      <div class="setup-title">⛳ SELECT PLAYERS</div>
+      <div id="profilePickList" class="profile-pick-list"></div>
+      <div id="manualSlots"></div>
+      <button class="btn-add-player" id="btnAddManual" onclick="addManualSlot()">+ Add Guest Player</button>
+      <div class="format-buttons">
+        <button class="btn-format" onclick="startGame(9)">FRONT 9<span class="holes">9 HOLES</span></button>
+        <button class="btn-format" onclick="startGame(18)">FULL 18<span class="holes">18 HOLES</span></button>
+      </div>
+    </div>
+    <!-- Right: selected lineup -->
+    <div class="setup-card">
+      <div class="setup-title">📋 LINEUP</div>
+      <div id="lineupList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div class="screen" id="screenGame">
+  <div class="game-layout">
+    <div>
+      <div class="scoring-panel" id="scoringPanel">
+        <div class="now-playing">
+          <img class="now-avatar" id="nowAvatar" src="" alt="">
+          <div class="now-text">
+            <div class="now-label">Now Playing</div>
+            <div class="now-player" id="nowPlayer">—</div>
+            <div class="now-hole" id="nowHole">HOLE 1</div>
+          </div>
+        </div>
+        <div class="score-buttons">
+          <button class="btn-score btn-dbl-bogey" onclick="enterScore(2)"><span class="score-val">+2</span><span class="score-label">DBL BOGEY</span></button>
+          <button class="btn-score btn-bogey" onclick="enterScore(1)"><span class="score-val">+1</span><span class="score-label">BOGEY</span></button>
+          <button class="btn-score btn-par" onclick="enterScore(0)"><span class="score-val">E</span><span class="score-label">PAR</span></button>
+          <button class="btn-score btn-birdie" onclick="enterScore(-1)"><span class="score-val">−1</span><span class="score-label">BIRDIE</span></button>
+          <button class="btn-score btn-eagle" onclick="enterScore(-2)"><span class="score-val">−2</span><span class="score-label">EAGLE</span></button>
+        </div>
+        <div class="undo-col">
+          <button class="btn-undo-main" id="undoBtnMain" onclick="undoLast()">↩ UNDO<br>LAST ENTRY</button>
+        </div>
+      </div>
+      <div class="finish-panel" id="finishPanel" style="display:none;"><div id="finishInner"></div></div>
+      <div class="scorecard-wrap">
+        <div class="sc-header">
+          <span>SCORECARD</span>
+          <button class="undo-btn" id="undoBtnTop" onclick="undoLast()">↩ UNDO</button>
+        </div>
+        <div style="overflow-x:auto;"><table class="scorecard-table" id="scorecardTable"></table></div>
+      </div>
+    </div>
+    <div class="leaderboard-col">
+      <div class="leaderboard">
+        <div class="lb-header">🏆 Leaderboard</div>
+        <table class="lb-table">
+          <thead><tr><th style="width:36px">POS</th><th>PLAYER</th><th class="right">SCORE</th><th class="right">THRU</th></tr></thead>
+          <tbody id="leaderboardBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- QUIT MODAL -->
+<div class="modal-overlay" id="quitModal">
+  <div class="modal-box">
+    <div class="modal-icon">🚪</div>
+    <div class="modal-title">Quit Game?</div>
+    <div class="modal-sub">Your current game will be lost.<br>Are you sure?</div>
+    <div class="modal-buttons">
+      <button class="btn-modal-cancel" onclick="closeModal('quitModal')">CANCEL</button>
+      <button class="btn-modal-danger" onclick="confirmQuit()">QUIT GAME</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD PROFILE MODAL -->
+<div class="modal-overlay" id="addProfileModal">
+  <div class="modal-box">
+    <div class="modal-icon">👤</div>
+    <div class="modal-title" id="profileModalTitle">NEW PROFILE</div>
+    <label class="avatar-upload-label" for="avatarInput">
+      <img class="avatar-preview" id="avatarPreview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Ccircle cx='40' cy='30' r='18' fill='%23556080'/%3E%3Cellipse cx='40' cy='72' rx='28' ry='20' fill='%23556080'/%3E%3C/svg%3E" alt="">
+      <span class="avatar-upload-hint">TAP TO ADD PHOTO</span>
+    </label>
+    <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="previewAvatar(event)">
+    <input class="modal-input" id="profileNameInput" placeholder="PLAYER NAME" maxlength="20">
+    <div class="modal-buttons">
+      <button class="btn-modal-cancel" onclick="closeModal('addProfileModal')">CANCEL</button>
+      <button class="btn-modal-action" onclick="saveProfile()">SAVE</button>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY MODAL -->
+<div class="modal-overlay" id="historyModal">
+  <div class="modal-box" style="max-width:480px;">
+    <div class="modal-icon">📊</div>
+    <div class="modal-title" id="historyModalTitle">ROUND HISTORY</div>
+    <div class="history-list" id="historyList"></div>
+    <div class="modal-buttons" style="margin-top:16px;">
+      <button class="btn-modal-cancel" onclick="closeModal('historyModal')">CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<!-- CELEBRATION SCREEN -->
+<div id="screenCelebration">
+  <div class="cel-bg-glow"></div>
+  <div id="confettiContainer" style="position:absolute;inset:0;pointer-events:none;overflow:hidden;"></div>
+  <div class="cel-content">
+    <div class="cel-eyebrow">🎯 Simply Darts Open</div>
+    <div class="cel-tournament">THE OPEN · CHAMPION</div>
+    <img class="cel-winner-avatar" id="celAvatar" src="" alt="" style="display:none;">
+    <span class="cel-trophy" id="celTrophy">🏆</span>
+    <div class="cel-winner-label">Winner</div>
+    <div class="cel-winner-name" id="celName">—</div>
+    <div class="cel-score-badge" id="celScore"></div>
+    <div class="cel-playoff-tag" id="celPlayoffTag" style="display:none;">Via Playoff</div>
+    <div class="cel-runners" id="celRunners"></div>
+    <div class="cel-buttons">
+      <button class="btn-cel-cert" onclick="printCertificate()">🏅 PRINT CERTIFICATE</button>
+      <button class="btn-cel-new" onclick="newGame()">🎮 NEW GAME</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STORAGE HELPERS ──
+async function loadProfiles() {
+  try {
+    const r = await window.storage.get('darts_golf_profiles');
+    return r ? JSON.parse(r.value) : [];
+  } catch { return []; }
+}
+async function saveProfiles(p) {
+  try { await window.storage.set('darts_golf_profiles', JSON.stringify(p)); } catch {}
+}
+
+// ── STATE ──
+let profiles = [];
+let players = [];       // [{name, avatar, profileId}]
+let totalHoles = 9;
+let scores = [];
+let history = [];
+let currentPlayer = 0;
+let currentHole = 0;
+let editingProfileId = null;
+let pendingAvatarData = null;
+let celebrationData = null;
+
+// ── INIT ──
+async function init() {
+  profiles = await loadProfiles();
+  renderProfilesScreen();
+  renderSetupScreen();
+}
+init();
+
+// ── SCREEN NAV ──
+function showScreen(name) {
+  ['screenProfiles','screenSetup','screenGame'].forEach(id => {
+    document.getElementById(id).classList.remove('active');
+  });
+  document.getElementById('screen' + name.charAt(0).toUpperCase() + name.slice(1)).classList.add('active');
+  document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active-nav'));
+  if (name === 'profiles') document.getElementById('navProfiles').classList.add('active-nav');
+  if (name === 'setup') document.getElementById('navSetup').classList.add('active-nav');
+}
+
+function handleHome() {
+  const gameActive = currentHole > 0 || currentPlayer > 0;
+  if (document.getElementById('screenGame').classList.contains('active') && gameActive) {
+    document.getElementById('quitModal').classList.add('active');
+  } else {
+    goHome();
+  }
+}
+
+function goHome() {
+  scores = []; history = []; currentPlayer = 0; currentHole = 0;
+  document.getElementById('screenCelebration').classList.remove('active');
+  document.getElementById('finishPanel').style.display = 'none';
+  document.getElementById('scoringPanel').style.display = '';
+  document.getElementById('headerMode').textContent = '—';
+  renderSetupScreen();
+  showScreen('setup');
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+function confirmQuit() { closeModal('quitModal'); goHome(); }
+
+// ── PROFILES ──
+function renderProfilesScreen() {
+  const grid = document.getElementById('profilesGrid');
+  let html = '';
+  profiles.forEach(p => {
+    const rounds = p.history || [];
+    const best = rounds.length ? Math.min(...rounds.map(r => r.score)) : null;
+    const bestStr = best === null ? '—' : (best === 0 ? 'E' : (best > 0 ? '+' + best : '' + best));
+    const wins = rounds.filter(r => r.won).length;
+    html += `
+      <div class="profile-card">
+        ${p.avatar
+          ? `<img class="profile-avatar" src="${p.avatar}" alt="${p.name}" onclick="openEditProfile('${p.id}')">`
+          : `<div class="profile-avatar-placeholder" onclick="openEditProfile('${p.id}')">👤</div>`}
+        <div class="profile-name">${p.name}</div>
+        <div class="profile-rounds">${rounds.length} ROUNDS · ${wins} WINS</div>
+        <div class="profile-best">BEST: ${bestStr}</div>
+        <div class="profile-actions">
+          <button class="btn-sm highlight" onclick="openHistory('${p.id}')">HISTORY</button>
+          <button class="btn-sm" onclick="openEditProfile('${p.id}')">EDIT</button>
+          <button class="btn-sm danger" onclick="deleteProfile('${p.id}')">✕</button>
+        </div>
+      </div>`;
+  });
+  html += `<div class="add-profile-card" onclick="openAddProfile()"><div class="plus">＋</div><div class="add-label">NEW PROFILE</div></div>`;
+  grid.innerHTML = html;
+}
+
+function openAddProfile() {
+  editingProfileId = null;
+  pendingAvatarData = null;
+  document.getElementById('profileModalTitle').textContent = 'NEW PROFILE';
+  document.getElementById('profileNameInput').value = '';
+  document.getElementById('avatarPreview').src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Ccircle cx='40' cy='30' r='18' fill='%23556080'/%3E%3Cellipse cx='40' cy='72' rx='28' ry='20' fill='%23556080'/%3E%3C/svg%3E";
+  document.getElementById('addProfileModal').classList.add('active');
+  setTimeout(() => document.getElementById('profileNameInput').focus(), 100);
+}
+
+function openEditProfile(id) {
+  const p = profiles.find(x => x.id === id);
+  if (!p) return;
+  editingProfileId = id;
+  pendingAvatarData = null;
+  document.getElementById('profileModalTitle').textContent = 'EDIT PROFILE';
+  document.getElementById('profileNameInput').value = p.name;
+  document.getElementById('avatarPreview').src = p.avatar || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Ccircle cx='40' cy='30' r='18' fill='%23556080'/%3E%3Cellipse cx='40' cy='72' rx='28' ry='20' fill='%23556080'/%3E%3C/svg%3E";
+  document.getElementById('addProfileModal').classList.add('active');
+}
+
+function previewAvatar(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    pendingAvatarData = ev.target.result;
+    document.getElementById('avatarPreview').src = pendingAvatarData;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function saveProfile() {
+  const name = document.getElementById('profileNameInput').value.trim();
+  if (!name) return;
+  if (editingProfileId) {
+    const p = profiles.find(x => x.id === editingProfileId);
+    p.name = name;
+    if (pendingAvatarData) p.avatar = pendingAvatarData;
+  } else {
+    profiles.push({ id: 'p_' + Date.now(), name, avatar: pendingAvatarData || null, history: [] });
+  }
+  await saveProfiles(profiles);
+  closeModal('addProfileModal');
+  renderProfilesScreen();
+  renderSetupScreen();
+}
+
+async function deleteProfile(id) {
+  profiles = profiles.filter(p => p.id !== id);
+  await saveProfiles(profiles);
+  renderProfilesScreen();
+  renderSetupScreen();
+}
+
+function openHistory(id) {
+  const p = profiles.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('historyModalTitle').textContent = p.name.toUpperCase() + ' · HISTORY';
+  const rounds = (p.history || []).slice().reverse();
+  if (!rounds.length) {
+    document.getElementById('historyList').innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px;font-size:13px;letter-spacing:1px;">NO ROUNDS YET</div>';
+  } else {
+    document.getElementById('historyList').innerHTML = rounds.map(r => {
+      const sc = r.score === 0 ? 'E' : (r.score > 0 ? '+' + r.score : '' + r.score);
+      const cls = r.score < 0 ? 'color:var(--green)' : r.score === 0 ? 'color:var(--white)' : 'color:var(--bogey)';
+      return `<div class="history-row">
+        <div>
+          <div class="history-date">${r.date}</div>
+          <div class="history-holes">${r.holes} HOLES</div>
+          ${r.won ? '<div class="history-won">🏆 WINNER</div>' : ''}
+        </div>
+        <div class="history-score" style="${cls}">${sc}</div>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('historyModal').classList.add('active');
+}
+
+// ── SETUP ──
+let selectedProfileIds = [];
+let manualSlots = [];
+
+function renderSetupScreen() {
+  // Profile pick list
+  const list = document.getElementById('profilePickList');
+  if (!profiles.length) {
+    list.innerHTML = `<div style="color:var(--muted);font-size:12px;letter-spacing:1px;margin-bottom:12px;text-align:center;">No profiles yet — <span style="color:var(--lightblue);cursor:pointer;" onclick="showScreen('profiles')">create some</span> or add guests below</div>`;
+  } else {
+    list.innerHTML = profiles.map(p => {
+      const sel = selectedProfileIds.includes(p.id);
+      return `<div class="profile-pick-row ${sel ? 'selected' : ''}" onclick="toggleProfilePick('${p.id}')">
+        ${p.avatar ? `<img class="pick-avatar" src="${p.avatar}">` : `<div class="pick-avatar" style="display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--surface2);">👤</div>`}
+        <div>
+          <div class="pick-name">${p.name}</div>
+          <div class="pick-stats">${(p.history||[]).length} rounds</div>
+        </div>
+        ${sel ? '<div class="pick-check">✓</div>' : ''}
+      </div>`;
+    }).join('');
+  }
+  renderManualSlots();
+  renderLineup();
+}
+
+function toggleProfilePick(id) {
+  const idx = selectedProfileIds.indexOf(id);
+  if (idx === -1) {
+    if (selectedProfileIds.length + manualSlots.length >= 8) return;
+    selectedProfileIds.push(id);
+  } else {
+    selectedProfileIds.splice(idx, 1);
+  }
+  renderSetupScreen();
+}
+
+function addManualSlot() {
+  if (selectedProfileIds.length + manualSlots.length >= 8) return;
+  manualSlots.push('');
+  renderManualSlots();
+  renderLineup();
+}
+
+function renderManualSlots() {
+  const el = document.getElementById('manualSlots');
+  el.innerHTML = manualSlots.map((n, i) => `
+    <div class="player-slot">
+      <div class="slot-avatar" style="display:flex;align-items:center;justify-content:center;font-size:18px;">👤</div>
+      <input class="slot-name-input" placeholder="Guest name" value="${n}" oninput="manualSlots[${i}]=this.value;renderLineup()">
+      <button class="btn-remove" onclick="removeManualSlot(${i})">✕</button>
+    </div>`).join('');
+}
+
+function removeManualSlot(i) {
+  manualSlots.splice(i, 1);
+  renderManualSlots();
+  renderLineup();
+}
+
+function renderLineup() {
+  const el = document.getElementById('lineupList');
+  const all = [
+    ...selectedProfileIds.map(id => { const p = profiles.find(x => x.id === id); return { name: p.name, avatar: p.avatar, profileId: p.id }; }),
+    ...manualSlots.map(n => ({ name: n || 'Guest', avatar: null, profileId: null }))
+  ];
+  if (!all.length) {
+    el.innerHTML = '<div style="color:var(--muted);font-size:12px;letter-spacing:1px;text-align:center;padding:20px;">Select players from the left</div>';
+    return;
+  }
+  el.innerHTML = all.map((p, i) => `
+    <div class="player-slot" style="cursor:default;">
+      ${p.avatar ? `<img class="slot-avatar" src="${p.avatar}">` : `<div class="slot-avatar" style="display:flex;align-items:center;justify-content:center;font-size:18px;">👤</div>`}
+      <div class="slot-name">${p.name}</div>
+      <div style="font-size:11px;color:var(--muted);letter-spacing:1px;">${p.profileId ? '👤' : 'GUEST'}</div>
+    </div>`).join('');
+}
+
+function buildPlayerList() {
+  return [
+    ...selectedProfileIds.map(id => { const p = profiles.find(x => x.id === id); return { name: p.name, avatar: p.avatar, profileId: p.id }; }),
+    ...manualSlots.map((n, i) => ({ name: n.trim() || `Guest ${i+1}`, avatar: null, profileId: null }))
+  ];
+}
+
+// ── GAME ──
+function startGame(holes) {
+  players = buildPlayerList();
+  if (!players.length) { players = [{ name: 'Player 1', avatar: null, profileId: null }]; }
+  totalHoles = holes;
+  scores = players.map(() => Array(totalHoles).fill(null));
+  history = [];
+  currentPlayer = 0;
+  currentHole = 0;
+  document.getElementById('headerMode').textContent = holes === 9 ? 'FRONT 9' : 'FULL 18';
+  document.getElementById('scoringPanel').style.display = '';
+  document.getElementById('finishPanel').style.display = 'none';
+  showScreen('game');
+  renderAll();
+}
+
+function enterScore(val) {
+  if (currentHole >= totalHoles) return;
+  history.push({ playerIdx: currentPlayer, holeIdx: currentHole, value: scores[currentPlayer][currentHole] });
+  scores[currentPlayer][currentHole] = val;
+  currentPlayer++;
+  if (currentPlayer >= players.length) { currentPlayer = 0; currentHole++; }
+  renderAll();
+  if (currentHole >= totalHoles) showFinish();
+}
+
+function undoLast() {
+  if (!history.length) return;
+  const last = history.pop();
+  scores[last.playerIdx][last.holeIdx] = last.value;
+  currentPlayer--;
+  if (currentPlayer < 0) { currentPlayer = players.length - 1; currentHole = Math.max(0, currentHole - 1); }
+  document.getElementById('finishPanel').style.display = 'none';
+  document.getElementById('scoringPanel').style.display = '';
+  renderAll();
+}
+
+// ── FINISH / PLAYOFF ──
+function showFinish() {
+  document.getElementById('scoringPanel').style.display = 'none';
+  document.getElementById('finishPanel').style.display = '';
+  const totals = players.map((p, i) => ({ ...p, i, total: getTotal(i) }));
+  const best = Math.min(...totals.map(p => p.total));
+  const leaders = totals.filter(p => p.total === best);
+  if (leaders.length === 1) {
+    submitRounds(leaders[0].i);
+    showCelebration(leaders[0], best, false);
+  } else {
+    showPlayoffPanel(leaders, best);
+  }
+}
+
+function showPlayoffPanel(leaders, tiedScore) {
+  const sc = fmtScore(tiedScore, 1);
+  const names = leaders.map(p => `<strong style="color:var(--white)">${p.name}</strong>`).join(', ');
+  const btns = leaders.map(p =>
+    `<button class="btn-playoff-winner" onclick="confirmPlayoffWinner(${p.i})">${p.name}</button>`
+  ).join('');
+  document.getElementById('finishInner').innerHTML = `
+    <div class="playoff-title">⚡ PLAYOFF!</div>
+    <div class="playoff-sub">Tied at ${sc} — ${names} are level</div>
+    <div style="font-size:12px;color:var(--muted);letter-spacing:1px;margin-bottom:16px;">Play off the tie, then tap the winner:</div>
+    <div class="playoff-players">${btns}</div>`;
+}
+
+function confirmPlayoffWinner(i) {
+  submitRounds(i);
+  showCelebration(players[i], getTotal(i), true);
+}
+
+async function submitRounds(winnerIdx) {
+  const today = new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+  for (let i = 0; i < players.length; i++) {
+    const p = players[i];
+    if (!p.profileId) continue;
+    const profile = profiles.find(x => x.id === p.profileId);
+    if (!profile) continue;
+    if (!profile.history) profile.history = [];
+    profile.history.push({ date: today, holes: totalHoles, score: getTotal(i), won: i === winnerIdx });
+    if (profile.history.length > 10) profile.history = profile.history.slice(-10);
+  }
+  await saveProfiles(profiles);
+  renderProfilesScreen();
+}
+
+function showCelebration(winner, total, viaPlayoff) {
+  celebrationData = { winner, total, viaPlayoff };
+  document.getElementById('screenGame').classList.remove('active');
+  document.getElementById('celName').textContent = winner.name;
+  document.getElementById('celScore').textContent = fmtScore(total, 1) + ' — ' + totalHoles + ' Holes';
+  document.getElementById('celPlayoffTag').style.display = viaPlayoff ? 'inline-block' : 'none';
+  if (winner.avatar) {
+    const av = document.getElementById('celAvatar');
+    av.src = winner.avatar; av.style.display = 'block';
+    document.getElementById('celTrophy').style.display = 'none';
+  } else {
+    document.getElementById('celAvatar').style.display = 'none';
+    document.getElementById('celTrophy').style.display = 'block';
+  }
+  const others = players.map((p, i) => ({ name: p.name, total: getTotal(i) }))
+    .filter(p => p.name !== winner.name).sort((a, b) => a.total - b.total);
+  document.getElementById('celRunners').textContent = others.map(p => p.name + ' (' + fmtScore(p.total, 1) + ')').join('  ·  ');
+  const cel = document.getElementById('screenCelebration');
+  cel.classList.remove('active'); void cel.offsetWidth; cel.classList.add('active');
+  cel.querySelectorAll('.cel-eyebrow,.cel-tournament,.cel-winner-avatar,.cel-trophy,.cel-winner-label,.cel-winner-name,.cel-score-badge,.cel-playoff-tag,.cel-runners,.cel-buttons').forEach(el => {
+    el.style.animation = 'none'; void el.offsetWidth; el.style.animation = '';
+  });
+  launchConfetti();
+}
+
+function launchConfetti() {
+  const c = document.getElementById('confettiContainer');
+  c.innerHTML = '';
+  const cols = ['#7EBB4C','#37BDEE','#FEEE00','#00c853','#fff','#ff6b6b'];
+  for (let i = 0; i < 130; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.cssText = `left:${Math.random()*100}vw;top:-20px;background:${cols[Math.floor(Math.random()*cols.length)]};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${2+Math.random()*3}s;animation-delay:${Math.random()*2}s`;
+    c.appendChild(el);
+  }
+}
+
+// ── CERTIFICATE ──
+function printCertificate() {
+  const d = celebrationData;
+  if (!d) return;
+  const sc = fmtScore(d.total, 1);
+  const today = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+  const playoff = d.viaPlayoff ? '<div style="font-size:14px;color:#37BDEE;letter-spacing:3px;margin-bottom:8px;">VIA PLAYOFF</div>' : '';
+  const avatarHtml = d.winner.avatar ? `<img src="${d.winner.avatar}" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid #FEEE00;margin:0 auto 16px;display:block;">` : '<div style="font-size:64px;text-align:center;margin-bottom:12px;">🏆</div>';
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html><head><title>Simply Darts Open Certificate</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    @page { size: A4 landscape; margin: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0F1C33; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: 'Rajdhani', sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .cert {
+      width: 260mm; max-width: 96vw; background: #0F1C33;
+      border: 3px solid #37BDEE; border-radius: 16px; padding: 40px 50px; text-align: center; position: relative; overflow: hidden;
+    }
+    .cert::before { content: ''; position: absolute; inset: 8px; border: 1px solid rgba(55,189,238,0.25); border-radius: 10px; pointer-events: none; }
+    .corner { position: absolute; width: 40px; height: 40px; border-color: #FEEE00; border-style: solid; }
+    .tl { top: 16px; left: 16px; border-width: 3px 0 0 3px; }
+    .tr { top: 16px; right: 16px; border-width: 3px 3px 0 0; }
+    .bl { bottom: 16px; left: 16px; border-width: 0 0 3px 3px; }
+    .br { bottom: 16px; right: 16px; border-width: 0 3px 3px 0; }
+    .org { font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 6px; color: #37BDEE; margin-bottom: 4px; }
+    .title { font-family: 'Bebas Neue', sans-serif; font-size: 52px; letter-spacing: 6px; color: #fff; line-height: 1; margin-bottom: 6px; }
+    .title span { color: #7EBB4C; }
+    .subtitle { font-size: 12px; color: rgba(255,255,255,0.4); letter-spacing: 4px; margin-bottom: 24px; }
+    .cert-presents { font-size: 13px; color: rgba(255,255,255,0.5); letter-spacing: 3px; margin-bottom: 6px; }
+    .winner-name { font-family: 'Bebas Neue', sans-serif; font-size: 72px; letter-spacing: 4px; background: linear-gradient(135deg,#7EBB4C,#37BDEE,#FEEE00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; margin-bottom: 8px; }
+    .cert-sub { font-size: 14px; color: rgba(255,255,255,0.5); letter-spacing: 3px; margin-bottom: 6px; }
+    .score-pill { display: inline-block; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.2); border-radius: 30px; font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: #fff; padding: 6px 28px; margin-bottom: 16px; letter-spacing: 2px; }
+    .divider { width: 200px; height: 2px; background: linear-gradient(90deg,transparent,#37BDEE,transparent); margin: 16px auto; }
+    .date-line { font-size: 12px; color: rgba(255,255,255,0.35); letter-spacing: 3px; margin-bottom: 20px; }
+    .footer { display: flex; justify-content: space-around; align-items: flex-end; margin-top: 20px; }
+    .sig-line { border-top: 1px solid rgba(255,255,255,0.2); width: 140px; padding-top: 6px; font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 2px; }
+    .watermark { position: absolute; font-family: 'Bebas Neue', sans-serif; font-size: 120px; letter-spacing: 20px; color: rgba(55,189,238,0.04); top: 50%; left: 50%; transform: translate(-50%,-50%); white-space: nowrap; pointer-events: none; }
+    @media print { body { background: #0F1C33 !important; } .cert { break-inside: avoid; } }
+  </style></head><body>
+  <div class="cert">
+    <div class="watermark">SIMPLY DARTS</div>
+    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+    <div class="org">SIMPLY DARTS OPEN</div>
+    <div class="title">THE <span>OPEN</span></div>
+    <div class="subtitle">OFFICIAL WINNER'S CERTIFICATE</div>
+    ${avatarHtml}
+    <div class="cert-presents">THIS CERTIFICATE IS PROUDLY PRESENTED TO</div>
+    <div class="winner-name">${d.winner.name}</div>
+    <div class="cert-sub">FOR WINNING THE SIMPLY DARTS OPEN${d.viaPlayoff ? ' · PLAYOFF VICTORY' : ''}</div>
+    ${playoff}
+    <div class="score-pill">${sc} · ${totalHoles} HOLES</div>
+    <div class="divider"></div>
+    <div class="date-line">${today}</div>
+    <div class="footer">
+      <div class="sig-line">TOURNAMENT DIRECTOR</div>
+      <div style="font-size:32px;">🎯</div>
+      <div class="sig-line">SIMPLY DARTS OPEN</div>
+    </div>
+  </div>
+  <script>window.onload=()=>setTimeout(()=>window.print(),600);<\/script>
+  </body></html>`);
+  win.document.close();
+}
+
+// ── TOTALS / HELPERS ──
+function getTotal(i) { return scores[i].reduce((s, v) => s + (v !== null ? v : 0), 0); }
+function getHolesPlayed(i) { return scores[i].filter(v => v !== null).length; }
+function fmtScore(total, played) { if (!played) return '—'; if (total === 0) return 'E'; return total > 0 ? '+' + total : '' + total; }
+function scoreClass(v) { if (v===null) return ''; if (v===-2) return 'cv-eagle'; if (v===-1) return 'cv-birdie'; if (v===0) return 'cv-par'; if (v===1) return 'cv-bogey'; return 'cv-double'; }
+function scoreText(v) { if (v===null) return ''; if (v===0) return 'E'; return v > 0 ? '+'+v : ''+v; }
+function chipClass(t, p) { if (!p) return 'chip-zero'; if (t<=-2) return 'chip-eagle'; if (t<0) return 'chip-birdie'; if (t===0) return 'chip-par'; if (t===1) return 'chip-bogey'; return 'chip-double'; }
+
+// ── RENDER ──
+function renderAll() { renderNowPlaying(); renderLeaderboard(); renderScorecard(); renderUndoBtn(); }
+
+function renderNowPlaying() {
+  if (currentHole >= totalHoles) return;
+  const p = players[currentPlayer];
+  document.getElementById('nowPlayer').textContent = p.name;
+  document.getElementById('nowHole').textContent = 'HOLE ' + (currentHole + 1);
+  const av = document.getElementById('nowAvatar');
+  if (p.avatar) { av.src = p.avatar; av.style.display = 'block'; } else { av.style.display = 'none'; }
+}
+
+function renderUndoBtn() {
+  const d = !history.length;
+  document.getElementById('undoBtnTop').disabled = d;
+  document.getElementById('undoBtnMain').disabled = d;
+}
+
+function renderLeaderboard() {
+  const sorted = players.map((p, i) => ({ ...p, i, total: getTotal(i), played: getHolesPlayed(i) }))
+    .sort((a, b) => { if (!a.played && !b.played) return 0; if (!a.played) return 1; if (!b.played) return -1; return a.total - b.total; });
+  document.getElementById('leaderboardBody').innerHTML = sorted.map((p, rank) => {
+    const posClass = ['pos-1','pos-2','pos-3'][rank] || 'pos-other';
+    const sc = fmtScore(p.total, p.played);
+    const isActive = p.i === currentPlayer && currentHole < totalHoles;
+    const avatarHtml = p.avatar ? `<img class="lb-player-avatar" src="${p.avatar}">` : '';
+    return `<tr class="${isActive ? 'active-row' : ''}">
+      <td><span class="pos-badge ${posClass}">${rank+1}</span></td>
+      <td class="player-name">${avatarHtml}${p.name}${isActive ? ' ●' : ''}</td>
+      <td class="right"><span class="score-chip ${chipClass(p.total, p.played)}">${sc}</span></td>
+      <td class="right"><span class="holes-played">${p.played}/${totalHoles}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderScorecard() {
+  const table = document.getElementById('scorecardTable');
+  let html = '<thead><tr>';
+  html += `<th class="col-player sc-hole-header" rowspan="2">PLAYER</th>`;
+  if (totalHoles === 18) {
+    html += `<th colspan="9" class="sc-section-header">FRONT 9</th><th class="sc-hole-header total-cell">F9</th>`;
+    html += `<th colspan="9" class="sc-section-header">BACK 9</th><th class="sc-hole-header total-cell">B9</th>`;
+    html += `<th class="sc-hole-header total-cell" style="color:var(--cyan)">TOT</th>`;
+  } else {
+    html += `<th colspan="9" class="sc-section-header">FRONT 9</th>`;
+    html += `<th class="sc-hole-header total-cell" style="color:var(--cyan)">TOT</th>`;
+  }
+  html += '</tr><tr>';
+  for (let h = 0; h < totalHoles; h++) {
+    html += `<th class="sc-hole-header">${h+1}</th>`;
+    if (totalHoles === 18 && h === 8) html += `<th class="sc-hole-header total-cell"></th>`;
+  }
+  if (totalHoles === 18) html += `<th class="sc-hole-header total-cell"></th>`;
+  html += `<th class="sc-hole-header total-cell"></th></tr></thead><tbody>`;
+
+  players.forEach((p, pi) => {
+    const isActive = pi === currentPlayer && currentHole < totalHoles;
+    const avatarHtml = p.avatar ? `<img style="width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:6px;" src="${p.avatar}">` : '';
+    html += `<tr class="sc-player-row ${isActive ? 'active-player' : ''}">`;
+    html += `<td class="col-player" style="height:44px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;">${avatarHtml}${p.name}</td>`;
+    let f9 = 0, b9 = 0;
+    for (let h = 0; h < totalHoles; h++) {
+      const v = scores[pi][h];
+      html += `<td><div class="cell-val ${scoreClass(v)}">${scoreText(v)}</div></td>`;
+      if (v !== null) { if (h < 9) f9 += v; else b9 += v; }
+      if (totalHoles === 18 && h === 8) {
+        const p9 = scores[pi].slice(0,9).filter(v=>v!==null).length;
+        html += `<td class="total-cell"><div class="cell-val" style="font-size:14px;color:var(--cyan)">${fmtScore(f9,p9)}</div></td>`;
+      }
+    }
+    if (totalHoles === 18) {
+      const p9 = scores[pi].slice(9,18).filter(v=>v!==null).length;
+      html += `<td class="total-cell"><div class="cell-val" style="font-size:14px;color:var(--cyan)">${fmtScore(b9,p9)}</div></td>`;
+    }
+    html += `<td class="total-cell"><div class="cell-val" style="font-size:15px;font-weight:700;color:var(--yellow)">${fmtScore(getTotal(pi),getHolesPlayed(pi))}</div></td></tr>`;
+  });
+  html += '</tbody>';
+  table.innerHTML = html;
+}
+
+function newGame() {
+  scores = []; history = []; currentPlayer = 0; currentHole = 0;
+  document.getElementById('screenCelebration').classList.remove('active');
+  document.getElementById('finishPanel').style.display = 'none';
+  document.getElementById('scoringPanel').style.display = '';
+  document.getElementById('headerMode').textContent = '—';
+  selectedProfileIds = []; manualSlots = [];
+  renderSetupScreen();
+  showScreen('setup');
+}
+</script>
+</body>
+</html>
